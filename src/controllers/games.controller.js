@@ -14,11 +14,11 @@ export async function postGame(req, res) {
 
   try { 
     const game = await db.query(`SELECT * FROM games WHERE name = $1;`, [name]);
-    if (game) res.status(409).send("Game already exists");
+    if (game.rows[0].length) res.status(409).send("Game already exists");
 
     await db.query(`
-      INSERT INTO games (id, name, image, "stockTotal", "pricePerDay")
-      VALUES (id, $1, $2, $3);`,
+      INSERT INTO games (name, image, "stockTotal", "pricePerDay")
+      VALUES ($1, $2, $3, $4);`,
       [name, image, stockTotal, pricePerDay]
     );
                       
