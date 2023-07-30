@@ -7,7 +7,7 @@ export async function getRentals(req, res) {
       SELECT rentals.*,
         TO_CHAR(rentals."rentDate", 'YYYY-MM-DD') AS "rentDate",
         TO_CHAR(rentals."returnDate", 'YYYY-MM-DD') AS "returnDate",
-        customers."name" AS "customerName,
+        customers."name" AS "customerName",
         games."name" AS "gameName"
         FROM rentals
         JOIN customers ON rentals."customerId" = customers."id"
