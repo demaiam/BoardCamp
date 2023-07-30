@@ -24,7 +24,7 @@ export async function postRental(req, res) {
   const { customerId, gameId, daysRented } = req.body;
 
   try {
-    if (daysRented <= 0) return res.status(400).send("Days not greater than zero");
+    if (daysRented <= 0) return res.status(400).send("Days rented not greater than zero");
 
     const customer = await db.query(`
       SELECT * FROM customers
@@ -41,14 +41,14 @@ export async function postRental(req, res) {
     if (!game.rows.length) return res.status(400).send("Game doesn't exist");
     
     const rentedGames = await db.query(`
-      SELECT COUNT(*) AS "gameRented"
+      SELECT COUNT(*) AS rentings
         FROM rentals
         WHERE "gameId" = $1
-        AND "returnDate" = $2;`,
-        [gameId, null]
+        AND "returnDate" IS NULL`,
+        [gameId]
     );
 
-    if (game.rows[0].stockTotal - Number(rentedGames.rows[0].gameRented) <= 0) return res.status(400).send("Game not available");
+    if (game.rows[0].stockTotal - Number(rentedGames.rows[0].rentings) <= 0) return res.status(400).send("Game not available");
 
     await db.query(`
       INSERT INTO rentals ("customerId", "gameId", "rentDate", "daysRented", "returnDate", "originalPrice", "delayFee")
