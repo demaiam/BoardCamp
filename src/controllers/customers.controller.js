@@ -40,7 +40,7 @@ export async function postCustomer(req, res) {
         WHERE cpf = $1;`, [cpf]
     );
 
-    if (customer.rows.length) return res.status(409).send("Customer already exists");
+    if (customer.rows.length) return res.status(409).send("CPF already belongs to another customer");
 
     await db.query(`
       INSERT INTO customers (name, phone, cpf, birthday)
@@ -61,7 +61,7 @@ export async function updateCustomer(req, res) {
   try {
     const customerCpf = await db.query(`
       SELECT * FROM customers 
-        WHERE cpf = $1;`, [cpf]
+        WHERE cpf = $1 AND id != $2;`, [cpf, id]
     );
 
     if (customerCpf.rows.length) return res.status(409).send("CPF already belongs to another customer");
@@ -75,7 +75,8 @@ export async function updateCustomer(req, res) {
 
     await db.query(`
       UPDATE customers 
-        SET name = $1, phone = $2, cpf = $3, birthday = $4 WHERE id = $5;`,
+        SET name = $1, phone = $2, cpf = $3, birthday = $4
+        WHERE id = $5;`,
         [name, phone, cpf, birthday, id]
     );
 
