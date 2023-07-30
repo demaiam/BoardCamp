@@ -5,10 +5,10 @@ export async function getRentals(req, res) {
   try {
     const rentals = await db.query(`
       SELECT rentals.*,
-        rentals."rentDate", AS "rentDate"
-        rentals."returnDate, AS "returnDate",
+        TO_CHAR(rentals."rentDate", 'YYYY-MM-DD') AS "rentDate",
+        TO_CHAR(rentals."returnDate", 'YYYY-MM-DD') AS "returnDate",
         customers."name" AS "customerName,
-        games."name" as "gameName"
+        games."name" AS "gameName"
         FROM rentals
         JOIN customers ON rentals."customerId" = customers."id"
         JOIN games ON rentals."gameId" = games."id";`
@@ -45,7 +45,7 @@ export async function postRental(req, res) {
       [gameId, null]
     );
 
-    if (game.stockTotal - Number(rentedGames.rows[0].gameRented) <= 0) return res.status(400).send("Game not available");
+    if (game.rows[0].stockTotal - Number(rentedGames.rows[0].gameRented) <= 0) return res.status(400).send("Game not available");
 
     await db.query(`
       INSERT INTO rentals ("customerId", "gameId", "rentDate", "daysRented", "returnDate", "originalPrice", "delayFee")
@@ -73,7 +73,7 @@ export async function endRental(req, res) {
 
     const game = await db.query(`
       SELECT "pricePerDay" FROM games
-        WHERE id = $1;`, rental.rows[0].gameId
+        WHERE id = $1;`, [rental.rows[0].gameId]
     );
 
     const returnDate = new Date();
@@ -82,11 +82,9 @@ export async function endRental(req, res) {
     const differenceInTime = returnDate.getTime() - rentDate.getTime();
     const differenceInDays = differenceInTime / (1000 * 3600 * 24);
 
-    let aux = 0;
+    let delayFee = 0;
     if (differenceInDays - rental.rows[0].daysRented - 1 > 0)
-      aux = (differenceInDays - rental.rows[0].daysRented - 1) * game.rows[0].pricePerDay;
-
-    const delayFee = aux;
+      delayFee = (differenceInDays - rental.rows[0].daysRented - 1) * game.rows[0].pricePerDay;
 
     await db.query(`
       UPDATE rentals SET "returnDate" = $1, "delayFee" = $2 WHERE id = $3;`,
