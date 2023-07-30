@@ -37,6 +37,7 @@ export async function postRental(req, res) {
       [customerId, gameId, dayjs().format('YYYY-MM-DD'), daysRented, null, daysRented * game.rows[0].pricePerDay, null]
     );
 
+    res.sendStatus(201);
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -60,7 +61,7 @@ export async function endRental(req, res) {
 
     let aux = 0;
     if (differenceInDays - rental.rows[0].daysRented - 1 > 0)
-      aux = (differenceInDays - rental.rows[0].daysRented - 1)  * game.rows[0].pricePerDay;
+      aux = (differenceInDays - rental.rows[0].daysRented - 1) * game.rows[0].pricePerDay;
 
     const delayFee = aux;
 
@@ -68,6 +69,8 @@ export async function endRental(req, res) {
       UPDATE rentals SET "returnDate" = $1, "delayFee" = $2 WHERE id = $3;`,
       [dayjs().format('YYYY-MM-DD'), delayFee, id]
     );
+
+    res.sendStatus(200);
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -79,7 +82,7 @@ export async function deleteRental(req, res) {
   try {
     const rental = await db.query(`SELECT * FROM rentals WHERE id = $1;`, [id]);
     if (!rental.rows.length) return res.status(404).send("Rental doesn't exist");
-    if (rental.rows[0].returnDate == null) return res.status(400).send("Rental not finished yet");
+    if (rental.rows[0].returnDate == null) return res.status(400).send("Rental not finished");
 
     await db.query(`DELETE FROM rentals WHERE id = $1;`, [id]);
 

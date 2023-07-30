@@ -26,7 +26,7 @@ export async function postCustomer(req, res) {
   const { name, phone, cpf, birthday } = req.body;
 
   try { 
-    const customer = await db.quey(`SELECT * FROM customers WHERE cpf = $1;`, [cpf]);
+    const customer = await db.query(`SELECT * FROM customers WHERE cpf = $1;`, [cpf]);
     if (customer.rows.length) res.status(409).send("Customer already exists");
 
     await db.query(`
