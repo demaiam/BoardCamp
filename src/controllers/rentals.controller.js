@@ -29,6 +29,7 @@ export async function postRental(req, res) {
 
     const game = await db.query(`SELECT * FROM games WHERE id = $1;`, [gameId]);
     if (!game.rows.length) return res.status(400).send("Game doesn't exist");
+    if (game.rows[0].stockTotal == 0) return res.status(400).send("Game not in stock");
 
     await db.query(`
       INSERT INTO rentals ("customerId", "gameId", "rentDate", "daysRented", "returnDate", "originalPrice", "delayFee"),
