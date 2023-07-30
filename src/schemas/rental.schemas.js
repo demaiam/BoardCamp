@@ -1,7 +1,7 @@
 import Joi from "joi";
 
 export const schemaRental = Joi.object({
-  customerId: Joi.any(),
-  gameId: Joi.any(),
-  daysRented: Joi.number().positive()
+  customerId: Joi.number().positive().required(),
+  gameId: Joi.number().positive().required(),
+  daysRented: Joi.number().positive().required()
 });
