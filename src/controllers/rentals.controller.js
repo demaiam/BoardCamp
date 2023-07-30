@@ -14,7 +14,23 @@ export async function getRentals(req, res) {
         JOIN games ON rentals."gameId" = games."id";`
     );
 
-    res.send(rentals.rows);
+    const formattedRentals = rentals.rows.map((r) => ({
+      rentDate: r.rentDate,
+      daysRented: r.daysRented,
+      returnDate: r.returnDate,
+      originalPrice: r.originalPrice,
+      delayFee: r.delayFee,
+      customer: {
+        id: r.customerId,
+        name: r.customerName
+      },
+      game: {
+        id: r.gameId,
+        name: r.gameName
+      }
+    }));
+
+    res.send(formattedRentals);
   } catch (err) {
     res.status(500).send(err.message);
   }
