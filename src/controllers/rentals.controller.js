@@ -25,10 +25,10 @@ export async function postRental(req, res) {
 
   try {
     const customer = await db.query(`SELECT * FROM customers WHERE id = $1;`, [customerId]);
-    if (!customer.rows[0].length) return res.status(400).send("User doesn't exist");
+    if (!customer.rows.length) return res.status(400).send("User doesn't exist");
 
     const game = await db.query(`SELECT * FROM games WHERE id = $1;`, [gameId]);
-    if (!game.rows[0].length) return res.status(400).send("Game doesn't exist");
+    if (!game.rows.length) return res.status(400).send("Game doesn't exist");
 
     await db.query(`
       INSERT INTO rentals ("customerId", "gameId", "rentDate", "daysRented", "returnDate", "originalPrice", "delayFee"),
@@ -46,7 +46,7 @@ export async function endRental(req, res) {
 
   try {
     const rental = await db.query(`SELECT * FROM rentals WHERE id = $1;`, [id]);
-    if (!rental.rows[0].length) return res.status(404).send("Rental doesn't exist");
+    if (!rental.rows.length) return res.status(404).send("Rental doesn't exist");
     if (rental.rows[0].returnDate != null) return res.status(400).send("Rental already finished");
 
     const game = await db.query(`SELECT "pricePerDay" FROM games WHERE id = $1;`, rental.rows[0].gameId);
@@ -73,5 +73,17 @@ export async function endRental(req, res) {
 }
 
 export async function deleteRental(req, res) {
-  
+  const { id } = req.params;
+
+  try {
+    const rental = await db.query(`SELECT * FROM rentals WHERE id = $1;`, [id]);
+    if (!rental.rows.length) return res.status(404).send("Rental doesn't exist");
+    if (rental.rows[0].returnDate == null) return res.status(400).send("Rental not finished yet");
+
+    await db.query(`DELETE FROM rentals WHERE id = $1;`, [id]);
+
+    res.sendStatus(200);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
 }

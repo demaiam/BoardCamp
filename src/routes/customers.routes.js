@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { getCustomers, getCustomerById, postCustomer, updateCustomer } from "../controllers/customers.controller.js";
-import { validateSchema } from "../middlewares/validateSchema.js";
+import { validateSchema } from "../middlewares/validateSchema.middleware.js";
 import { schemaCustomer } from "../schemas/customer.schemas.js";
 
 const customersRouter = Router();

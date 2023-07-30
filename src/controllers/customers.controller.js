@@ -14,7 +14,7 @@ export async function getCustomerById(req, res) {
 
   try {
     const customer = await db.query(`SELECT * FROM customers WHERE id = $1;`, [id]);
-    if (!customer.rows[0].length) res.status(404).send("Customer doesn't exist");
+    if (!customer.rows.length) res.status(404).send("Customer doesn't exist");
     
     res.send(customer.rows[0]);
   } catch (err) {
@@ -27,7 +27,7 @@ export async function postCustomer(req, res) {
 
   try { 
     const customer = await db.quey(`SELECT * FROM customers WHERE cpf = $1;`, [cpf]);
-    if (customer.rows[0].length) res.status(409).send("Customer already exists");
+    if (customer.rows.length) res.status(409).send("Customer already exists");
 
     await db.query(`
       INSERT INTO customers (name, phone, cpf, birthday)
@@ -47,7 +47,7 @@ export async function updateCustomer(req, res) {
 
   try {
     const customer = await db.query(`SELECT * FROM customers WHERE cpf = $1;`, [cpf]);
-    if (!customer.rows[0].length) res.status(409).send("Customer doesn't exist");
+    if (!customer.rows.length) res.status(409).send("Customer doesn't exist");
 
     await db.query(`
       UPDATE customers 
