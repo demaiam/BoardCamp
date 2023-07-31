@@ -98,7 +98,7 @@ export async function endRental(req, res) {
         WHERE id = $1;`, [rental.rows[0].gameId]
     );
 
-    const returnDate = new Date(rental.rows[0].returnDate);
+    const returnDate = new Date();
     const rentDate = new Date(rental.rows[0].rentDate);
 
     const differenceInTime = Math.abs(returnDate.getTime() - rentDate.getTime());
