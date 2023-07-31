@@ -16,6 +16,8 @@ export async function getRentals(req, res) {
 
     const formattedRentals = rentals.rows.map((r) => ({
       id: r.id,
+      customerId: r.customerId,
+      gameId: r.gameId,
       rentDate: r.rentDate,
       daysRented: r.daysRented,
       returnDate: r.returnDate,
