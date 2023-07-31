@@ -15,6 +15,7 @@ export async function getRentals(req, res) {
     );
 
     const formattedRentals = rentals.rows.map((r) => ({
+      id: r.id,
       rentDate: r.rentDate,
       daysRented: r.daysRented,
       returnDate: r.returnDate,
