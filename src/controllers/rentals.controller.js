@@ -106,7 +106,7 @@ export async function endRental(req, res) {
 
     let delayFee = 0;
     if (differenceInDays - rental.rows[0].daysRented - 1 > 0)
-      delayFee = (differenceInDays - rental.rows[0].daysRented - 1) * game.rows[0].pricePerDay;
+      delayFee = Math.floor((differenceInDays - rental.rows[0].daysRented - 1) * game.rows[0].pricePerDay);
 
     await db.query(`
       UPDATE rentals SET "returnDate" = $1, "delayFee" = $2 WHERE id = $3;`,
